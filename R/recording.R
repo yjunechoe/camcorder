@@ -110,11 +110,25 @@ record_gt <- function(x, ...) {
     ))
   }
 
+  webshot_device <- switch(
+    GG_RECORDING_ENV$device,
+    jpeg =, bmp =, tiff =, png = "png",
+    emf =, svg =, eps =, ps =, pdf = "pdf"
+  )
+  if (!webshot_device %in% c("png", "pdf")) {
+    rlang::inform(c(
+      "i" = sprintf(
+        '"%s" not supported for rendering gt tables. Using "%s" instead.',
+        GG_RECORDING_ENV$device, webshot_device
+      )
+    ))
+  }
+
   plot_files <-
     file.path(GG_RECORDING_ENV$recording_dir, paste0(
       format(Sys.time(), "%Y_%m_%d_%H_%M_%OS6"),
       ".",
-      c("html", "png") # webshot() only supports png for raster
+      c("html", webshot_device)
     ))
 
   # Convert to pixel for webshot()
